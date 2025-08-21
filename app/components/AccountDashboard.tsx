@@ -74,14 +74,14 @@ export default function AccountDashboard({ onBack, onCampaignSelect }: AccountDa
           </div>
           <Wallet>
             <ConnectWallet className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm">
-              <Avatar className="h-5 w-5" />
-              <Name className="text-sm" />
+              <Avatar address={address} className="h-5 w-5" />
+              <Name address={address} className="text-sm" />
             </ConnectWallet>
             <WalletDropdown>
               <div className="px-4 pt-3 pb-2">
-                <Avatar className="h-8 w-8" />
-                <Name className="font-semibold" />
-                <Address className="text-sm text-gray-600" />
+                <Avatar address={address} className="h-8 w-8" />
+                <Name address={address} className="font-semibold" />
+                <Address address={address} className="text-sm text-gray-600" />
               </div>
               <WalletDropdownDisconnect className="hover:bg-gray-100" />
             </WalletDropdown>
@@ -93,10 +93,10 @@ export default function AccountDashboard({ onBack, onCampaignSelect }: AccountDa
         {/* User Profile Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center space-x-4 mb-4">
-            <Avatar className="h-16 w-16" />
+            <Avatar address={address} className="h-16 w-16" />
             <div className="flex-1">
-              <Name className="text-lg font-bold text-gray-900" />
-              <Address className="text-sm text-gray-500" />
+              <Name address={address} className="text-lg font-bold text-gray-900" />
+              <Address address={address} className="text-sm text-gray-500" />
             </div>
           </div>
           

@@ -135,14 +135,14 @@ export default function CampaignDetails({ campaignId, campaign, onBack }: Campai
           <div className="flex items-center space-x-2">
             <Wallet>
               <ConnectWallet className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm">
-                <Avatar className="h-5 w-5" />
-                <Name className="text-sm" />
+                <Avatar address={address} className="h-5 w-5" />
+                <Name address={address} className="text-sm" />
               </ConnectWallet>
               <WalletDropdown>
                 <div className="px-4 pt-3 pb-2">
-                  <Avatar className="h-8 w-8" />
-                  <Name className="font-semibold" />
-                  <Address className="text-sm text-gray-600" />
+                  <Avatar address={address} className="h-8 w-8" />
+                  <Name address={address} className="font-semibold" />
+                  <Address address={address} className="text-sm text-gray-600" />
                 </div>
                 <WalletDropdownDisconnect className="hover:bg-gray-100" />
               </WalletDropdown>
