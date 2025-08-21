@@ -5,8 +5,9 @@ import { CampaignData, CampaignFormData } from '../types/campaign';
 import CampaignListing from './CampaignListing';
 import CreateCampaign from './CreateCampaign';
 import CampaignDetails from './CampaignDetails';
+import AccountDashboard from './AccountDashboard';
 
-type ViewType = 'home' | 'create' | 'details';
+type ViewType = 'home' | 'create' | 'details' | 'account';
 
 interface AppNavigationState {
   view: ViewType;
@@ -36,6 +37,10 @@ export default function AppNavigation() {
     setNavigationState({ view: 'home' });
   };
 
+  const handleAccountClick = () => {
+    setNavigationState({ view: 'account' });
+  };
+
   const handleCampaignCreated = (campaignData: CampaignFormData) => {
     // After successful campaign creation, go back to home
     console.log('Campaign created successfully:', campaignData);
@@ -58,6 +63,14 @@ export default function AppNavigation() {
           onBack={handleBackToHome}
         />
       );
+
+    case 'account':
+      return (
+        <AccountDashboard
+          onBack={handleBackToHome}
+          onCampaignSelect={handleCampaignSelect}
+        />
+      );
     
     case 'home':
     default:
@@ -65,6 +78,7 @@ export default function AppNavigation() {
         <CampaignListing
           onCampaignSelect={handleCampaignSelect}
           onCreateClick={handleCreateClick}
+          onAccountClick={handleAccountClick}
         />
       );
   }

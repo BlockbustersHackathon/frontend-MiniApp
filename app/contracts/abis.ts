@@ -162,6 +162,13 @@ export const CAMPAIGN_ABI = [
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateCampaignState",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   }
 ] as const;
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { formatUnits, parseUnits } from 'viem';
 import { CampaignData, CampaignState } from '../types/campaign';
-import { useCampaignContribute, useUserContribution } from '../hooks/useCampaign';
+import { useCampaignContribute, useUserContribution, useWithdrawFunds, useClaimTokens, useRefund } from '../hooks/useCampaign';
 import { useUSDCApprove, useUSDCAllowance } from '../hooks/useUSDC';
 import { useReadContract } from 'wagmi';
 import { CROWDFUNDING_FACTORY_ABI } from '../contracts/abis';
@@ -44,6 +44,9 @@ export default function CampaignDetails({ campaignId, campaign, onBack }: Campai
   const { data: userContribution } = useUserContribution(campaignAddress, address);
   const { data: allowance } = useUSDCAllowance(address, campaignAddress);
   const { approve, isPending: isApproving, isConfirmed: isApproved } = useUSDCApprove();
+  const { withdrawFunds, isPending: isWithdrawing, isConfirmed: isWithdrawn, error: withdrawError, hash: withdrawHash } = useWithdrawFunds(campaignAddress);
+  const { claimTokens, isPending: isClaiming, isConfirmed: isClaimed, error: claimError, hash: claimHash } = useClaimTokens(campaignAddress);
+  const { refund, isPending: isRefunding, isConfirmed: isRefunded, error: refundError, hash: refundHash } = useRefund(campaignAddress);
   
   const [needsApproval, setNeedsApproval] = useState(false);
 
@@ -317,8 +320,160 @@ export default function CampaignDetails({ campaignId, campaign, onBack }: Campai
             <p className="text-green-700 text-sm mb-4">
               Congratulations! Your campaign has reached its funding goal. You can now withdraw the funds.
             </p>
-            <button className="w-full bg-green-600 text-white py-3 px-6 rounded-full font-medium hover:bg-green-700 transition-colors">
-              Withdraw Funds
+            
+            {/* Withdraw Transaction Status */}
+            {(isWithdrawing || isWithdrawn || withdrawError) && (
+              <div className={`mb-4 p-4 rounded-lg ${
+                isWithdrawn ? 'bg-green-100 border border-green-300' : 
+                withdrawError ? 'bg-red-100 border border-red-300' : 
+                'bg-blue-100 border border-blue-300'
+              }`}>
+                {isWithdrawing && <p className="text-blue-800 text-sm">Withdrawing funds...</p>}
+                {isWithdrawn && (
+                  <div className="text-green-800 text-sm">
+                    <p>✅ Funds withdrawn successfully!</p>
+                    {withdrawHash && (
+                      <p className="mt-1">
+                        <a 
+                          href={`https://basescan.org/tx/${withdrawHash}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="underline hover:no-underline"
+                        >
+                          View on BaseScan
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                )}
+                {withdrawError && (
+                  <p className="text-red-800 text-sm">
+                    ❌ {withdrawError.message || 'Withdraw failed'}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <button 
+              onClick={() => withdrawFunds()}
+              disabled={isWithdrawing || isWithdrawn}
+              className="w-full bg-green-600 text-white py-3 px-6 rounded-full font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isWithdrawing ? 'Withdrawing...' : isWithdrawn ? 'Funds Withdrawn' : 'Withdraw Funds'}
+            </button>
+          </div>
+        )}
+
+        {/* Token Claiming Section for Contributors */}
+        {!isCreator && userContribution && userContribution.amount > BigInt(0) && 
+         campaign.state === CampaignState.Succeeded && 
+         projectMode === 'launchpad' && !userContribution.claimed && (
+          <div className="bg-purple-50 rounded-xl border border-purple-200 p-6 mb-6">
+            <h3 className="font-semibold text-purple-800 mb-3">Claim Your Tokens! 🎯</h3>
+            <p className="text-purple-700 text-sm mb-4">
+              The campaign succeeded! You can now claim your tokens for your contribution of {formatUnits(userContribution.amount, 6)} USDC.
+            </p>
+            
+            {/* Claim Transaction Status */}
+            {(isClaiming || isClaimed || claimError) && (
+              <div className={`mb-4 p-4 rounded-lg ${
+                isClaimed ? 'bg-green-100 border border-green-300' : 
+                claimError ? 'bg-red-100 border border-red-300' : 
+                'bg-blue-100 border border-blue-300'
+              }`}>
+                {isClaiming && <p className="text-blue-800 text-sm">Claiming tokens...</p>}
+                {isClaimed && (
+                  <div className="text-green-800 text-sm">
+                    <p>✅ Tokens claimed successfully!</p>
+                    {claimHash && (
+                      <p className="mt-1">
+                        <a 
+                          href={`https://basescan.org/tx/${claimHash}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="underline hover:no-underline"
+                        >
+                          View on BaseScan
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                )}
+                {claimError && (
+                  <p className="text-red-800 text-sm">
+                    ❌ {claimError.message || 'Claim failed'}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="bg-white rounded-lg p-4 border mb-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">You will receive:</span>
+                <span className="font-medium text-purple-600">
+                  ≈ {formatUnits(userContribution.tokenAllocation, 18)} tokens
+                </span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => claimTokens()}
+              disabled={isClaiming || isClaimed}
+              className="w-full bg-purple-600 text-white py-3 px-6 rounded-full font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isClaiming ? 'Claiming...' : isClaimed ? 'Tokens Claimed' : 'Claim Tokens'}
+            </button>
+          </div>
+        )}
+
+        {/* Refund Section for Failed Campaigns */}
+        {!isCreator && userContribution && userContribution.amount > BigInt(0) && 
+         campaign.state === CampaignState.Failed && (
+          <div className="bg-red-50 rounded-xl border border-red-200 p-6 mb-6">
+            <h3 className="font-semibold text-red-800 mb-3">Campaign Failed - Get Refund</h3>
+            <p className="text-red-700 text-sm mb-4">
+              Unfortunately, this campaign didn&apos;t reach its funding goal. You can get a refund of your {formatUnits(userContribution.amount, 6)} USDC contribution.
+            </p>
+            
+            {/* Refund Transaction Status */}
+            {(isRefunding || isRefunded || refundError) && (
+              <div className={`mb-4 p-4 rounded-lg ${
+                isRefunded ? 'bg-green-100 border border-green-300' : 
+                refundError ? 'bg-red-100 border border-red-300' : 
+                'bg-blue-100 border border-blue-300'
+              }`}>
+                {isRefunding && <p className="text-blue-800 text-sm">Processing refund...</p>}
+                {isRefunded && (
+                  <div className="text-green-800 text-sm">
+                    <p>✅ Refund processed successfully!</p>
+                    {refundHash && (
+                      <p className="mt-1">
+                        <a 
+                          href={`https://basescan.org/tx/${refundHash}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="underline hover:no-underline"
+                        >
+                          View on BaseScan
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                )}
+                {refundError && (
+                  <p className="text-red-800 text-sm">
+                    ❌ {refundError.message || 'Refund failed'}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <button 
+              onClick={() => refund()}
+              disabled={isRefunding || isRefunded}
+              className="w-full bg-red-600 text-white py-3 px-6 rounded-full font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isRefunding ? 'Processing Refund...' : isRefunded ? 'Refund Processed' : 'Get Refund'}
             </button>
           </div>
         )}

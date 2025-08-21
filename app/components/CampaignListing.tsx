@@ -1,22 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useCampaignCount, useCampaign } from '../hooks/useCrowdfundingFactory';
 import CampaignCard from './CampaignCard';
-import { CampaignData } from '../types/campaign';
+import { CampaignData, CampaignState } from '../types/campaign';
 
 interface CampaignListingProps {
   onCampaignSelect?: (campaignId: bigint, campaign: CampaignData) => void;
   showCreateButton?: boolean;
   onCreateClick?: () => void;
+  onAccountClick?: () => void;
 }
 
 export default function CampaignListing({ 
   onCampaignSelect, 
   showCreateButton = true,
-  onCreateClick 
+  onCreateClick,
+  onAccountClick 
 }: CampaignListingProps) {
   const { data: campaignCount, isLoading: isLoadingCount } = useCampaignCount();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterState, setFilterState] = useState<'all' | 'active' | 'succeeded' | 'failed'>('all');
+  const [filterMode, setFilterMode] = useState<'all' | 'launchpad' | 'classic'>('all');
 
   // Generate array of campaign IDs to fetch
   const campaignIds = campaignCount ? Array.from({ length: Number(campaignCount) }, (_, i) => BigInt(i)) : [];
@@ -25,7 +30,7 @@ export default function CampaignListing({
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold text-gray-900">DAPP</h1>
           {showCreateButton && (
             <button
@@ -35,6 +40,46 @@ export default function CampaignListing({
               Create Project
             </button>
           )}
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-3">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search campaigns..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+            <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Filter Buttons */}
+        <div className="flex space-x-2 mb-2">
+          <select
+            value={filterState}
+            onChange={(e) => setFilterState(e.target.value as 'all' | 'active' | 'succeeded' | 'failed')}
+            className="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="all">All States</option>
+            <option value="active">Active</option>
+            <option value="succeeded">Succeeded</option>
+            <option value="failed">Failed</option>
+          </select>
+
+          <select
+            value={filterMode}
+            onChange={(e) => setFilterMode(e.target.value as 'all' | 'launchpad' | 'classic')}
+            className="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="all">All Modes</option>
+            <option value="launchpad">Launchpad</option>
+            <option value="classic">Classic</option>
+          </select>
         </div>
       </div>
 
@@ -89,10 +134,13 @@ export default function CampaignListing({
         {/* Campaign List */}
         <div className="space-y-4 pb-20">
           {campaignIds.map((campaignId) => (
-            <CampaignItem
+            <FilteredCampaignItem
               key={campaignId.toString()}
               campaignId={campaignId}
               onSelect={onCampaignSelect}
+              searchQuery={searchQuery}
+              filterState={filterState}
+              filterMode={filterMode}
             />
           ))}
         </div>
@@ -105,7 +153,7 @@ export default function CampaignListing({
             <div className="w-6 h-6 bg-purple-600 rounded-full"></div>
             <span className="text-xs text-gray-600">home</span>
           </button>
-          <button className="flex flex-col items-center space-y-1">
+          <button onClick={onAccountClick} className="flex flex-col items-center space-y-1">
             <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
             <span className="text-xs text-gray-400">account</span>
           </button>
@@ -115,13 +163,19 @@ export default function CampaignListing({
   );
 }
 
-// Individual campaign item component
-function CampaignItem({ 
+// Filtered campaign item component
+function FilteredCampaignItem({ 
   campaignId, 
-  onSelect 
+  onSelect,
+  searchQuery,
+  filterState,
+  filterMode
 }: { 
   campaignId: bigint; 
   onSelect?: (campaignId: bigint, campaign: CampaignData) => void;
+  searchQuery: string;
+  filterState: string;
+  filterMode: string;
 }) {
   const { data: campaign, isLoading, error } = useCampaign(campaignId);
 
@@ -142,11 +196,63 @@ function CampaignItem({
   }
 
   if (error || !campaign) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm border border-red-200 p-4">
-        <p className="text-red-500 text-sm">Error loading campaign #{campaignId.toString()}</p>
-      </div>
-    );
+    return null; // Hide errors when filtering
+  }
+
+  // Apply filters
+  const getProjectModeFromMetadata = (metadataURI: string): 'launchpad' | 'classic' => {
+    try {
+      if (metadataURI.startsWith('data:application/json,')) {
+        const jsonString = decodeURIComponent(metadataURI.substring(22));
+        const metadata = JSON.parse(jsonString);
+        return metadata.projectMode || 'classic';
+      }
+    } catch (error) {
+      console.error('Error parsing metadata:', error);
+    }
+    return 'classic';
+  };
+
+  const getDescriptionFromMetadata = (metadataURI: string): string => {
+    try {
+      if (metadataURI.startsWith('data:application/json,')) {
+        const jsonString = decodeURIComponent(metadataURI.substring(22));
+        const metadata = JSON.parse(jsonString);
+        return metadata.description || '';
+      }
+    } catch (error) {
+      console.error('Error parsing metadata:', error);
+    }
+    return '';
+  };
+
+  const projectMode = getProjectModeFromMetadata(campaign.metadataURI);
+  const description = getDescriptionFromMetadata(campaign.metadataURI);
+
+  // Filter by search query
+  if (searchQuery) {
+    const searchLower = searchQuery.toLowerCase();
+    if (!campaign.name.toLowerCase().includes(searchLower) && 
+        !description.toLowerCase().includes(searchLower)) {
+      return null;
+    }
+  }
+
+  // Filter by state
+  if (filterState !== 'all') {
+    const stateMap = {
+      'active': CampaignState.Active,
+      'succeeded': CampaignState.Succeeded,
+      'failed': CampaignState.Failed,
+    };
+    if (campaign.state !== stateMap[filterState as keyof typeof stateMap]) {
+      return null;
+    }
+  }
+
+  // Filter by mode
+  if (filterMode !== 'all' && projectMode !== filterMode) {
+    return null;
   }
 
   return (
