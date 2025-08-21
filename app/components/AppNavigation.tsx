@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CampaignData } from '../types/campaign';
+import { CampaignData, CampaignFormData } from '../types/campaign';
 import CampaignListing from './CampaignListing';
 import CreateCampaign from './CreateCampaign';
 import CampaignDetails from './CampaignDetails';
@@ -36,7 +36,7 @@ export default function AppNavigation() {
     setNavigationState({ view: 'home' });
   };
 
-  const handleCampaignCreated = (campaignData: any) => {
+  const handleCampaignCreated = (campaignData: CampaignFormData) => {
     // After successful campaign creation, go back to home
     console.log('Campaign created successfully:', campaignData);
     // Could show a success message here

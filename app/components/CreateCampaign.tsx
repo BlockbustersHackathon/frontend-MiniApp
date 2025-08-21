@@ -23,7 +23,7 @@ interface CreateCampaignProps {
 }
 
 export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { createCampaign, isPending, isConfirming, isConfirmed, error, hash } = useCreateCampaign();
   
   const [formData, setFormData] = useState<CampaignFormData>({

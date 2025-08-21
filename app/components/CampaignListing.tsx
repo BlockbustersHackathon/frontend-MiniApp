@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { useCampaignCount, useCampaign } from '../hooks/useCrowdfundingFactory';
 import CampaignCard from './CampaignCard';
 import { CampaignData } from '../types/campaign';
@@ -17,19 +17,9 @@ export default function CampaignListing({
   onCreateClick 
 }: CampaignListingProps) {
   const { data: campaignCount, isLoading: isLoadingCount } = useCampaignCount();
-  const [campaigns, setCampaigns] = useState<Array<{ id: bigint; data: CampaignData }>>([]);
-  const [loadingCampaigns, setLoadingCampaigns] = useState(false);
 
   // Generate array of campaign IDs to fetch
   const campaignIds = campaignCount ? Array.from({ length: Number(campaignCount) }, (_, i) => BigInt(i)) : [];
-
-  useEffect(() => {
-    if (campaignCount && Number(campaignCount) > 0) {
-      setLoadingCampaigns(true);
-      // Note: In a production app, you'd want to implement pagination
-      // For now, we'll load all campaigns (limited by the number)
-    }
-  }, [campaignCount]);
 
   return (
     <div className="min-h-screen bg-gray-50">

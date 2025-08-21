@@ -9,7 +9,7 @@ interface CampaignCardProps {
   onClick?: () => void;
 }
 
-export default function CampaignCard({ campaign, campaignId, onClick }: CampaignCardProps) {
+export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   const fundingGoalFormatted = parseFloat(formatUnits(campaign.fundingGoal, 6));
   const totalRaisedFormatted = parseFloat(formatUnits(campaign.totalRaised, 6));
   const progressPercentage = Math.min((totalRaisedFormatted / fundingGoalFormatted) * 100, 100);

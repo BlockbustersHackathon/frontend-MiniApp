@@ -287,10 +287,10 @@ export default function CampaignDetails({ campaignId, campaign, onBack }: Campai
               )}
 
               {/* Show user's previous contribution if any */}
-              {userContribution && userContribution.amount > 0n && (
+              {userContribution && userContribution.amount > BigInt(0) && (
                 <div className="bg-blue-50 rounded-lg p-3 text-sm">
                   <p className="text-blue-800">
-                    You've already contributed {formatUnits(userContribution.amount, 6)} USDC to this campaign.
+                    You&apos;ve already contributed {formatUnits(userContribution.amount, 6)} USDC to this campaign.
                   </p>
                 </div>
               )}

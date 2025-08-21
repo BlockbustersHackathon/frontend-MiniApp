@@ -1,7 +1,7 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { CROWDFUNDING_FACTORY_ABI } from '../contracts/abis';
 import { CONTRACT_ADDRESSES } from '../contracts/addresses';
-import { CreateCampaignParams, CampaignData } from '../types/campaign';
+import { CreateCampaignParams } from '../types/campaign';
 
 // Hook to read campaign data
 export function useCampaign(campaignId: bigint | undefined) {

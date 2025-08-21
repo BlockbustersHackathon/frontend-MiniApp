@@ -1,6 +1,5 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { CAMPAIGN_ABI } from '../contracts/abis';
-import { CampaignData, Contribution } from '../types/campaign';
 
 // Hook to contribute to a campaign
 export function useCampaignContribute(campaignAddress: `0x${string}` | undefined) {
