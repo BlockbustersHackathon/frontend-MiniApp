@@ -169,6 +169,13 @@ export const CAMPAIGN_ABI = [
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "createLiquidityPool",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   }
 ] as const;
 

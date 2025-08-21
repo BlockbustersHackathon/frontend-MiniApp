@@ -83,21 +83,6 @@ export default function CampaignListing({
         </div>
       </div>
 
-      {/* Campaign Brief Section */}
-      <div className="bg-white mx-4 mt-4 rounded-xl p-6 text-center shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Create Project</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
-        </p>
-        {showCreateButton && (
-          <button
-            onClick={onCreateClick}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-medium transition-colors"
-          >
-            Create Project
-          </button>
-        )}
-      </div>
 
       {/* Projects Info Section */}
       <div className="mx-4 mt-6">

@@ -143,3 +143,31 @@ export function useRefund(campaignAddress: `0x${string}` | undefined) {
     error,
   };
 }
+
+// Hook to create liquidity pool (for successful launchpad campaigns)
+export function useCreateLiquidityPool(campaignAddress: `0x${string}` | undefined) {
+  const { data: hash, writeContract, isPending, error } = useWriteContract();
+
+  const createLiquidityPool = () => {
+    if (!campaignAddress) return;
+    
+    writeContract({
+      address: campaignAddress,
+      abi: CAMPAIGN_ABI,
+      functionName: 'createLiquidityPool',
+    });
+  };
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  return {
+    createLiquidityPool,
+    hash,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+  };
+}
