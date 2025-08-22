@@ -12,7 +12,11 @@ import {
   useRefund,
   useCreateLiquidityPool,
 } from "../hooks/useCampaign";
-import { addUserContribution, addUserToken, markTokenClaimed } from "../utils/localStorage";
+import {
+  addUserContribution,
+  addUserToken,
+  markTokenClaimed,
+} from "../utils/localStorage";
 import { useWriteContract } from "wagmi";
 import { useUSDCApprove, useUSDCAllowance } from "../hooks/useUSDC";
 import { useReadContract } from "wagmi";
@@ -212,7 +216,7 @@ export default function CampaignDetails({
       );
 
       // If this is a launchpad campaign, also add token allocation
-      if (projectMode === 'launchpad') {
+      if (projectMode === "launchpad") {
         const contribution = parseFloat(contributionAmount);
         const fundingGoal = fundingGoalFormatted;
         const totalTokens = 750000000; // 0.75B tokens
@@ -229,7 +233,17 @@ export default function CampaignDetails({
         );
       }
     }
-  }, [isConfirmed, hash, contributionAmount, address, campaignId, projectMode, campaign.name, campaign.tokenAddress, fundingGoalFormatted]);
+  }, [
+    isConfirmed,
+    hash,
+    contributionAmount,
+    address,
+    campaignId,
+    projectMode,
+    campaign.name,
+    campaign.tokenAddress,
+    fundingGoalFormatted,
+  ]);
 
   // Track successful token claims
   useEffect(() => {
@@ -680,7 +694,6 @@ export default function CampaignDetails({
           userContribution &&
           userContribution.amount > BigInt(0) &&
           campaign.state === CampaignState.Succeeded &&
-          projectMode === "launchpad" &&
           !userContribution.claimed && (
             <div className="bg-purple-50 rounded-xl border border-purple-200 p-6 mb-6">
               <h3 className="font-semibold text-purple-800 mb-3">
