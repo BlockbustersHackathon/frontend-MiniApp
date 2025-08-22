@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useCampaignCount, useCampaign } from '../hooks/useCrowdfundingFactory';
-import CampaignCard from './CampaignCard';
-import { CampaignData, CampaignState } from '../types/campaign';
+import React, { useState } from "react";
+import { useCampaignCount, useCampaign } from "../hooks/useCrowdfundingFactory";
+import CampaignCard from "./CampaignCard";
+import { CampaignData, CampaignState } from "../types/campaign";
 
 interface CampaignListingProps {
   onCampaignSelect?: (campaignId: bigint, campaign: CampaignData) => void;
@@ -12,26 +12,32 @@ interface CampaignListingProps {
   onAccountClick?: () => void;
 }
 
-export default function CampaignListing({ 
-  onCampaignSelect, 
+export default function CampaignListing({
+  onCampaignSelect,
   showCreateButton = true,
   onCreateClick,
-  onAccountClick 
+  onAccountClick,
 }: CampaignListingProps) {
   const { data: campaignCount, isLoading: isLoadingCount } = useCampaignCount();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterState, setFilterState] = useState<'all' | 'active' | 'succeeded' | 'failed'>('all');
-  const [filterMode, setFilterMode] = useState<'all' | 'launchpad' | 'classic'>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterState, setFilterState] = useState<
+    "all" | "active" | "succeeded" | "failed"
+  >("all");
+  const [filterMode, setFilterMode] = useState<"all" | "launchpad" | "classic">(
+    "all"
+  );
 
-  // Generate array of campaign IDs to fetch
-  const campaignIds = campaignCount ? Array.from({ length: Number(campaignCount) }, (_, i) => BigInt(i)) : [];
+  // Generate array of campaign IDs to fetch (newest first - descending order)
+  const campaignIds = campaignCount
+    ? Array.from({ length: Number(campaignCount) }, (_, i) => BigInt(Number(campaignCount) - 1 - i))
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold text-gray-900">DAPP</h1>
+          <h1 className="text-xl font-bold text-gray-900">FundFuture</h1>
           {showCreateButton && (
             <button
               onClick={onCreateClick}
@@ -52,8 +58,18 @@ export default function CampaignListing({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
-            <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="absolute left-3 top-2.5 w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </div>
         </div>
@@ -62,7 +78,11 @@ export default function CampaignListing({
         <div className="flex space-x-2 mb-2">
           <select
             value={filterState}
-            onChange={(e) => setFilterState(e.target.value as 'all' | 'active' | 'succeeded' | 'failed')}
+            onChange={(e) =>
+              setFilterState(
+                e.target.value as "all" | "active" | "succeeded" | "failed"
+              )
+            }
             className="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="all">All States</option>
@@ -73,7 +93,9 @@ export default function CampaignListing({
 
           <select
             value={filterMode}
-            onChange={(e) => setFilterMode(e.target.value as 'all' | 'launchpad' | 'classic')}
+            onChange={(e) =>
+              setFilterMode(e.target.value as "all" | "launchpad" | "classic")
+            }
             className="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="all">All Modes</option>
@@ -83,14 +105,23 @@ export default function CampaignListing({
         </div>
       </div>
 
-
       {/* Projects Info Section */}
       <div className="mx-4 mt-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Projects Info</h3>
           <button className="p-2">
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>
@@ -107,12 +138,24 @@ export default function CampaignListing({
         {!isLoadingCount && campaignCount === BigInt(0) && (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-4l-2-4M5 7l2-4" />
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14-4l-2-4M5 7l2-4"
+                />
               </svg>
             </div>
             <p className="text-gray-500 text-sm">No campaigns available yet</p>
-            <p className="text-gray-400 text-xs mt-1">Be the first to create a campaign!</p>
+            <p className="text-gray-400 text-xs mt-1">
+              Be the first to create a campaign!
+            </p>
           </div>
         )}
 
@@ -138,7 +181,10 @@ export default function CampaignListing({
             <div className="w-6 h-6 bg-purple-600 rounded-full"></div>
             <span className="text-xs text-gray-600">home</span>
           </button>
-          <button onClick={onAccountClick} className="flex flex-col items-center space-y-1">
+          <button
+            onClick={onAccountClick}
+            className="flex flex-col items-center space-y-1"
+          >
             <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
             <span className="text-xs text-gray-400">account</span>
           </button>
@@ -149,14 +195,14 @@ export default function CampaignListing({
 }
 
 // Filtered campaign item component
-function FilteredCampaignItem({ 
-  campaignId, 
+function FilteredCampaignItem({
+  campaignId,
   onSelect,
   searchQuery,
   filterState,
-  filterMode
-}: { 
-  campaignId: bigint; 
+  filterMode,
+}: {
+  campaignId: bigint;
   onSelect?: (campaignId: bigint, campaign: CampaignData) => void;
   searchQuery: string;
   filterState: string;
@@ -185,30 +231,32 @@ function FilteredCampaignItem({
   }
 
   // Apply filters
-  const getProjectModeFromMetadata = (metadataURI: string): 'launchpad' | 'classic' => {
+  const getProjectModeFromMetadata = (
+    metadataURI: string
+  ): "launchpad" | "classic" => {
     try {
-      if (metadataURI.startsWith('data:application/json,')) {
+      if (metadataURI.startsWith("data:application/json,")) {
         const jsonString = decodeURIComponent(metadataURI.substring(22));
         const metadata = JSON.parse(jsonString);
-        return metadata.projectMode || 'classic';
+        return metadata.projectMode || "classic";
       }
     } catch (error) {
-      console.error('Error parsing metadata:', error);
+      console.error("Error parsing metadata:", error);
     }
-    return 'classic';
+    return "classic";
   };
 
   const getDescriptionFromMetadata = (metadataURI: string): string => {
     try {
-      if (metadataURI.startsWith('data:application/json,')) {
+      if (metadataURI.startsWith("data:application/json,")) {
         const jsonString = decodeURIComponent(metadataURI.substring(22));
         const metadata = JSON.parse(jsonString);
-        return metadata.description || '';
+        return metadata.description || "";
       }
     } catch (error) {
-      console.error('Error parsing metadata:', error);
+      console.error("Error parsing metadata:", error);
     }
-    return '';
+    return "";
   };
 
   const projectMode = getProjectModeFromMetadata(campaign.metadataURI);
@@ -217,18 +265,20 @@ function FilteredCampaignItem({
   // Filter by search query
   if (searchQuery) {
     const searchLower = searchQuery.toLowerCase();
-    if (!campaign.name.toLowerCase().includes(searchLower) && 
-        !description.toLowerCase().includes(searchLower)) {
+    if (
+      !campaign.name.toLowerCase().includes(searchLower) &&
+      !description.toLowerCase().includes(searchLower)
+    ) {
       return null;
     }
   }
 
   // Filter by state
-  if (filterState !== 'all') {
+  if (filterState !== "all") {
     const stateMap = {
-      'active': CampaignState.Active,
-      'succeeded': CampaignState.Succeeded,
-      'failed': CampaignState.Failed,
+      active: CampaignState.Active,
+      succeeded: CampaignState.Succeeded,
+      failed: CampaignState.Failed,
     };
     if (campaign.state !== stateMap[filterState as keyof typeof stateMap]) {
       return null;
@@ -236,7 +286,7 @@ function FilteredCampaignItem({
   }
 
   // Filter by mode
-  if (filterMode !== 'all' && projectMode !== filterMode) {
+  if (filterMode !== "all" && projectMode !== filterMode) {
     return null;
   }
 

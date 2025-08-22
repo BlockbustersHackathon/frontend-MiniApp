@@ -53,7 +53,7 @@ export default function AppNavigation() {
   // Render the appropriate view based on navigation state
   switch (navigationState.view) {
     case 'create':
-      return <CreateCampaign onSubmit={handleCampaignCreated} />;
+      return <CreateCampaign onSubmit={handleCampaignCreated} onBack={handleBackToHome} onAccountClick={handleAccountClick} />;
     
     case 'details':
       return (
@@ -61,6 +61,7 @@ export default function AppNavigation() {
           campaignId={navigationState.selectedCampaign!.id}
           campaign={navigationState.selectedCampaign!.data}
           onBack={handleBackToHome}
+          onAccountClick={handleAccountClick}
         />
       );
 

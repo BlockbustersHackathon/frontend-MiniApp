@@ -34,12 +34,14 @@ interface CampaignDetailsProps {
   campaignId: bigint;
   campaign: CampaignData;
   onBack?: () => void;
+  onAccountClick?: () => void;
 }
 
 export default function CampaignDetails({
   campaignId,
   campaign,
   onBack,
+  onAccountClick,
 }: CampaignDetailsProps) {
   const { address, isConnected } = useAccount();
   const [contributionAmount, setContributionAmount] = useState("");
@@ -360,14 +362,15 @@ export default function CampaignDetails({
                 >
                   {projectMode === "launchpad" ? "Launchpad" : "Classic"}
                 </span>
-                <span className="text-gray-500">owned by owner</span>
               </div>
               <div className="text-sm text-gray-500 mt-1">
-                created{" "}
-                {new Date(
-                  Number(campaign.createdAt) * 1000
-                ).toLocaleDateString()}{" "}
-                • deadline {deadline.toLocaleDateString()}
+                owned by <Address address={campaign.creator} className="text-gray-500" isSliced />
+              </div>
+              <div className="text-sm text-gray-500">
+                created {new Date(Number(campaign.createdAt) * 1000).toLocaleDateString()}
+              </div>
+              <div className="text-sm text-gray-500">
+                deadline {deadline.toLocaleDateString()}
               </div>
             </div>
           </div>
@@ -863,7 +866,10 @@ export default function CampaignDetails({
             <div className="w-6 h-6 bg-purple-600 rounded-full"></div>
             <span className="text-xs text-gray-600">home</span>
           </button>
-          <button className="flex flex-col items-center space-y-1">
+          <button
+            onClick={onAccountClick}
+            className="flex flex-col items-center space-y-1"
+          >
             <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
             <span className="text-xs text-gray-400">account</span>
           </button>

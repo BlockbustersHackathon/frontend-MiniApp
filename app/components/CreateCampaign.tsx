@@ -16,9 +16,11 @@ import { CAMPAIGN_CONSTANTS } from "../contracts/addresses";
 
 interface CreateCampaignProps {
   onSubmit?: (campaignData: CampaignFormData) => void;
+  onBack?: () => void;
+  onAccountClick?: () => void;
 }
 
-export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
+export default function CreateCampaign({ onSubmit, onBack, onAccountClick }: CreateCampaignProps) {
   const { address, isConnected } = useAccount();
   const { createCampaign, isPending, isConfirming, isConfirmed, error, hash } =
     useCreateCampaign();
@@ -145,7 +147,16 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
       <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <h1 className="text-xl font-bold">DAPP</h1>
+          <div className="flex items-center space-x-3">
+            {onBack && (
+              <button onClick={onBack} className="p-2 -ml-2">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            <h1 className="text-xl font-bold">Create Campaign</h1>
+          </div>
           <div className="flex items-center space-x-2">
             <Wallet>
               <ConnectWallet className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm">
@@ -296,7 +307,7 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
               type="text"
               value={formData.projectName}
               onChange={(e) => handleInputChange("projectName", e.target.value)}
-              placeholder="DAPP"
+              placeholder="FundFuture"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
             />
@@ -352,7 +363,7 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
                   onChange={(e) =>
                     handleInputChange("tokenName", e.target.value)
                   }
-                  placeholder="DAPP"
+                  placeholder="FundFuture"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 />
@@ -369,7 +380,7 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
                   onChange={(e) =>
                     handleInputChange("tokenSymbol", e.target.value)
                   }
-                  placeholder="DAPP"
+                  placeholder="FundFuture"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 />
@@ -378,7 +389,7 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
               {/* Liquidity Pool Parameters */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">
-                  liquidity pool parameters
+                  liquidity pool %
                 </label>
                 <div className="flex items-center space-x-3">
                   <input
@@ -412,7 +423,7 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
               onChange={(e) =>
                 handleInputChange("projectIntroduction", e.target.value)
               }
-              placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliquet..."
+              placeholder="Fund the future, Build the future."
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               required
@@ -439,11 +450,11 @@ export default function CreateCampaign({ onSubmit }: CreateCampaignProps) {
 
         {/* Bottom Navigation */}
         <div className="flex justify-around py-4 border-t border-gray-100">
-          <button className="flex flex-col items-center space-y-1">
+          <button onClick={onBack} className="flex flex-col items-center space-y-1">
             <div className="w-6 h-6 bg-purple-600 rounded-full"></div>
             <span className="text-xs text-gray-600">home</span>
           </button>
-          <button className="flex flex-col items-center space-y-1">
+          <button onClick={onAccountClick} className="flex flex-col items-center space-y-1">
             <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
             <span className="text-xs text-gray-400">account</span>
           </button>
